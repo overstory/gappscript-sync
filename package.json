@@ -1,0 +1,10 @@
+{
+  "name": "overstory-ld",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "node-google-apps-script": "^1.1.5"
+  }
+}

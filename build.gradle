@@ -1,8 +1,3 @@
-apply plugin: 'idea'
-apply plugin: 'distribution'
-apply plugin: "maven-publish"
-apply plugin: 'nebula.ospackage'
-apply plugin: 'io.ratpack.ratpack-groovy'
 
 buildscript {
 	repositories {
@@ -10,19 +5,51 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'io.ratpack:ratpack-gradle:1.4.2'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
 		classpath 'com.netflix.nebula:gradle-ospackage-plugin:3.5.0'
 	}
 }
+
+plugins {
+	id "com.moowork.node" version "1.1.1"
+	id "de.richsource.gradle.plugins.typescript" version "1.8.0"	// see https://github.com/sothmann/typescript-gradle-plugin
+}
+
+repositories {
+	jcenter()
+	mavenCentral()
+}
+
+apply plugin: 'idea'
+apply plugin: 'distribution'
+apply plugin: "maven-publish"
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'nebula.ospackage'
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '3.2'
 }
 
-ext.mavenRepos = {
-	jcenter()
-	mavenCentral()
+// -----------------------------------------------------
+
+import com.moowork.gradle.node.NodeExtension
+import com.moowork.gradle.node.variant.VariantBuilder
+
+node {
+	download = true
+}
+/*
+String nodeExecutable() {
+	NodeExtension nodeExt = NodeExtension.get(project)
+	return new VariantBuilder(nodeExt).build().nodeExec
+}*/
+
+task gappsPush(type: NodeTask) {
+	script = file('node_modules/node-google-apps-script/bin/gapps')
+	args = ['push']
+	dependsOn "npmInstall"
 }
 
-repositories mavenRepos
-
+task installPackages(type: NpmTask) {
+	args = ['install', 'node-google-apps-script' , '--save-dev']
+}
